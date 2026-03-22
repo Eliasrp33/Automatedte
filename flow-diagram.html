@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hur Automated Reception Fungerar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 2em;
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .step:hover {
+            transform: translateX(10px);
+        }
+        
+        .step:nth-child(1) { background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%); }
+        .step:nth-child(2) { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+        .step:nth-child(3) { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+        .step:nth-child(4) { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
+        .step:nth-child(5) { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .step:nth-child(1) .icon-box { background: #4f46e5; }
+        .step:nth-child(2) .icon-box { background: #7c3aed; }
+        .step:nth-child(3) .icon-box { background: #2563eb; }
+        .step:nth-child(4) .icon-box { background: #059669; }
+        .step:nth-child(5) .icon-box { background: #d97706; }
+        
+        .content {
+            flex: 1;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: rgba(0,0,0,0.1);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        
+        h3 {
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            color: #4b5563;
+            line-height: 1.5;
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #9ca3af;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+        
+        .benefits {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f9fafb;
+            border-radius: 15px;
+            border-left: 5px solid #4f46e5;
+        }
+        
+        .benefits h2 {
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            color: #374151;
+        }
+        
+        .benefit-item::before {
+            content: "✓";
+            background: #10b981;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 600px) {
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .icon-box {
+                width: 60px;
+                height: 60px;
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Så Fungerar Automated Reception</h1>
+        
+        <div class="flow-container">
+            <!-- Step 1 -->
+            <div class="step">
+                <div class="icon-box">📞</div>
+                <div class="content">
+                    <span class="step-number">STEG 1</span>
+                    <h3>Kunden Ringer</h3>
+                    <p>En potentiell kund ringer till din salong, ofta efter arbetstid när ni är upptagna eller stängda.</p>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <!-- Step 2 -->
+            <div class="step">
+                <div class="icon-box">🤖</div>
+                <div class="content">
+                    <span class="step-number">STEG 2</span>
+                    <h3>AI-Receptionisten Tar Över</h3>
+                    <p>Automated Reception svarar direkt på svenska. Kunden möts av en naturlig, vänlig röst som hjälper dem boka.</p>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <!-- Step 3 -->
+            <div class="step">
+                <div class="icon-box">💬</div>
+                <div class="content">
+                    <span class="step-number">STEG 3</span>
+                    <h3>Smart Dialog & Bokning</h3>
+                    <p>AI:n frågar om behandling, tid och namn. Kunden väljer enkelt mellan tillgängliga tider utan att pressa dig.</p>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <!-- Step 4 -->
+            <div class="step">
+                <div class="icon-box">📅</div>
+                <div class="content">
+                    <span class="step-number">STEG 4</span>
+                    <h3>Kalendern Uppdateras Automatiskt</h3>
+                    <p>Bokningen läggs direkt in i er Google Kalender. Alla i teamet ser tydligt vilka tider som är bokade.</p>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <!-- Step 5 -->
+            <div class="step">
+                <div class="icon-box">📱</div>
+                <div class="content">
+                    <span class="step-number">STEG 5</span>
+                    <h3>SMS-Bekräftelse Skickas</h3>
+                    <p>Kunden får omedelbart ett SMS med bokningsdetaljer. Ingen förvirring, inga missförstånd.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="benefits">
+            <h2>🎯 Fördelar för Din Salong</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">Färre missade samtal</div>
+                <div class="benefit-item">Fler bokade tider</div>
+                <div class="benefit-item">Mindre avbrott i arbetet</div>
+                <div class="benefit-item">24/7 tillgänglighet</div>
+                <div class="benefit-item">Gladare kunder</div>
+                <div class="benefit-item">Mer fokus på klippning</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
