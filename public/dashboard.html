@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Automated Reception</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell nav-shell">
+        <a class="brand" href="/">
+          <span class="brand-badge">A</span>
+          <span>Automated Reception</span>
+        </a>
+
+        <nav class="nav-links">
+          <a href="/#flode">Flöde</a>
+          <a href="/#funktioner">Funktioner</a>
+          <a href="/#priser">Priser</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button id="themeToggle" class="icon-btn" aria-label="Byt tema">◐</button>
+          <a class="btn ghost" href="/">Hem</a>
+          <a class="btn light" href="#agentForm">Ny agent</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell page">
+      <section class="panel section-block">
+        <div class="section-head">
+          <h2>Skapa AI-agent</h2>
+          <p>Fyll i kundens data så skapas deras AI-agent direkt för test.</p>
+        </div>
+
+        <form id="agentForm" class="feature-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+          <div class="feature-card">
+            <label>Salongsnamn</label>
+            <input name="salonName" required placeholder="T.ex. Salong Nordic" />
+          </div>
+          <div class="feature-card">
+            <label>Ägarens namn</label>
+            <input name="ownerName" required placeholder="T.ex. Elias" />
+          </div>
+          <div class="feature-card">
+            <label>Salongens nummer</label>
+            <input name="businessPhone" required placeholder="+46..." />
+          </div>
+          <div class="feature-card">
+            <label>AI-nummer</label>
+            <input name="aiNumber" required placeholder="+46..." />
+          </div>
+          <div class="feature-card">
+            <label>Bokningslänk (valfri)</label>
+            <input name="bookingUrl" placeholder="https://..." />
+          </div>
+          <div class="feature-card">
+            <label>Instagram (valfri)</label>
+            <input name="instagram" placeholder="@salong" />
+          </div>
+          <div class="feature-card" style="grid-column: 1 / -1;">
+            <label>Extra instruktioner</label>
+            <textarea name="notes" rows="3" placeholder="Öppettider, ton, regler..."></textarea>
+          </div>
+
+          <div style="grid-column: 1 / -1; text-align:center;">
+            <button class="btn light" type="submit">Skapa AI-agent</button>
+            <p id="agentMessage" class="muted" style="margin-top:10px;"></p>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel section-block">
+        <div class="section-head">
+          <h2>Aktiva agenter</h2>
+          <p>Översikt över skapade kundagenter.</p>
+        </div>
+        <div id="agentsList" class="feature-grid"></div>
+      </section>
+    </main>
+
+    <script>
+      const THEME_KEY = 'ar_theme';
+      const themeBtn = document.getElementById('themeToggle');
+
+      function setTheme(theme) {
+        document.body.classList.toggle('light-mode', theme === 'light');
+        localStorage.setItem(THEME_KEY, theme);
+      }
+
+      themeBtn?.addEventListener('click', () => {
+        const isLight = document.body.classList.contains('light-mode');
+        setTheme(isLight ? 'dark' : 'light');
+      });
+
+      setTheme(localStorage.getItem(THEME_KEY) || 'dark');
+
+      const form = document.getElementById('agentForm');
+      const msg = document.getElementById('agentMessage');
+      const agentsList = document.getElementById('agentsList');
+
+      async function getJson(url, options) {
+        const res = await fetch(url, options);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Request failed');
+        return data;
+      }
+
+      async function loadAgents() {
+        const data = await getJson('/api/agents');
+        const agents = data.agents || [];
+        if (!agents.length) {
+          agentsList.innerHTML = '<article class="feature-card"><p class="muted">Inga agenter skapade ännu.</p></article>';
+          return;
+        }
+
+        agentsList.innerHTML = agents.slice().reverse().map(agent => `
+          <article class="feature-card">
+            <h3>${agent.salonName}</h3>
+            <p>Ägare: ${agent.ownerName}</p>
+            <p>AI-nummer: ${agent.aiNumber}</p>
+            <p>Status: <strong>${agent.status}</strong></p>
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn ghost provision-btn" data-id="${agent.id}" ${agent.status === 'provisioned' ? 'disabled' : ''}>
+                ${agent.status === 'provisioned' ? 'Provisionerad' : 'Provisionera nummer'}
+              </button>
+            </div>
+          </article>
+        `).join('');
+
+        document.querySelectorAll('.provision-btn').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            btn.disabled = true;
+            btn.textContent = 'Provisionerar...';
+            try {
+              const result = await getJson(`/api/agents/${id}/provision`, { method: 'POST' });
+              msg.textContent = `✅ ${result.message}: ${result.agent.salonName}`;
+              await loadAgents();
+            } catch (error) {
+              msg.textContent = `❌ ${error.message}`;
+              btn.disabled = false;
+              btn.textContent = 'Provisionera nummer';
+            }
+          });
+        });
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        msg.textContent = 'Skapar agent...';
+
+        try {
+          const payload = Object.fromEntries(new FormData(form).entries());
+          const result = await getJson('/api/agents/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          msg.textContent = `✅ ${result.message}: ${result.agent.salonName}`;
+          form.reset();
+          await loadAgents();
+        } catch (error) {
+          msg.textContent = `❌ ${error.message}`;
+        }
+      });
+
+      loadAgents();
+    </script>
+  </body>
+</html>
