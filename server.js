@@ -1,9 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const OpenAI = require('openai');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
 
 app.use(cors());
 app.use(express.json());
@@ -224,6 +229,44 @@ app.post('/api/agents/:id/provision', (req, res) => {
     message: 'Nummer provisionerat och webhook kopplad för test',
     agent
   });
+});
+
+app.post('/api/tts', async (req, res) => {
+  try {
+    if (!openai) {
+      return res.status(500).json({
+        ok: false,
+        error: 'OPENAI_API_KEY saknas på servern'
+      });
+    }
+
+    const {
+      text,
+      voice = 'alloy',
+      model = 'gpt-4o-mini-tts',
+      format = 'mp3'
+    } = req.body || {};
+
+    if (!text || typeof text !== 'string') {
+      return res.status(400).json({ ok: false, error: 'text krävs' });
+    }
+
+    const audioResponse = await openai.audio.speech.create({
+      model,
+      voice,
+      input: text,
+      format
+    });
+
+    const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
+
+    res.setHeader('Content-Type', format === 'wav' ? 'audio/wav' : 'audio/mpeg');
+    res.setHeader('Cache-Control', 'no-store');
+    return res.send(audioBuffer);
+  } catch (error) {
+    console.error('TTS error:', error?.message || error);
+    return res.status(500).json({ ok: false, error: 'Kunde inte skapa TTS-ljud' });
+  }
 });
 
 // Health check
