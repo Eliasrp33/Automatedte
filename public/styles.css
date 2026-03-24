@@ -64,6 +64,14 @@ body {
   font-weight: 800;
 }
 
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+}
+
 .nav-links { display: inline-flex; justify-content: center; gap: 34px; }
 .nav-links a { text-decoration: none; color: var(--muted); font-weight: 500; }
 .nav-links a:hover { color: var(--text); }
