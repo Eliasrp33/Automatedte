@@ -273,8 +273,21 @@ h1 span {
 
 .feature-card h3,
 .price-card h3 { margin: 0 0 10px; font-size: 2rem; }
+.pricing-grid .price-card h3 { font-size: 1.45rem; }
 .feature-card p,
 .price-card p { margin: 0; color: var(--muted); font-size: 1.15rem; }
+
+.plan-meta {
+  margin: 0 0 8px !important;
+  font-size: .98rem !important;
+  color: var(--text) !important;
+  font-weight: 600;
+}
+
+.pricing-note {
+  text-align: center;
+  margin-top: 14px;
+}
 
 .price {
   margin: 0 0 10px !important;
